@@ -14,7 +14,7 @@ form.addEventListener('submit', event => {
         getter(1, request)
             .then(response => {
                 render(response)
-                new SimpleLightbox('.gallery div', { captionsData: 'alt', captionDelay: 250, });
+                new SimpleLightbox('.gallery a');
             });
     }
     
@@ -41,7 +41,7 @@ function render(response) {
     console.log(response);
     targepForAddingContent.innerHTML = 
     response.reduce((acc, {largeImageURL, webformatURL, likes, views, comments, downloads}) => {
-        return acc + `<div class="photo-card" href="${largeImageURL}">
+        return acc + `<a class="photo-card" href="${largeImageURL}">
                         <img src="${webformatURL}" alt="" loading="lazy" />
                         <div class="info">
                             <p class="info-item">
@@ -61,7 +61,7 @@ function render(response) {
                               <span>${downloads}</span>
                             </p>
                         </div>
-                    </div>`
+                    </a>`
     }, '')
 };
 
