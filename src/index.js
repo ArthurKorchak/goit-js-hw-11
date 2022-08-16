@@ -9,6 +9,7 @@ const targepForAddingContent = document.querySelector('.gallery');
 
 form.addEventListener('submit', event => {
     event.preventDefault();
+    targepForAddingContent.innerHTML = '';
     const request = event.target[0].value;
     if (request) {
         getter(1, request)
@@ -16,8 +17,8 @@ form.addEventListener('submit', event => {
                 render(response)
                 new SimpleLightbox('.gallery a');
             });
-    }
-    
+    };
+    form.reset();
 })
 
 
@@ -29,7 +30,7 @@ function getter(numberOfPage, request) {
             image_type: 'photo',
             orientation: 'horizontal',
             safesearch: true,
-            per_page: 10,
+            per_page: 16,
             page: numberOfPage
         }
     })
@@ -41,8 +42,10 @@ function render(response) {
     console.log(response);
     targepForAddingContent.innerHTML = 
     response.reduce((acc, {largeImageURL, webformatURL, likes, views, comments, downloads}) => {
-        return acc + `<a class="photo-card" href="${largeImageURL}">
-                        <img src="${webformatURL}" alt="" loading="lazy" />
+        return acc + `<div class="photo-card">
+                        <a href="${largeImageURL}">
+                            <img class="img" src="${webformatURL}" alt="" loading="lazy" />
+                        </a>
                         <div class="info">
                             <p class="info-item">
                                 <b>Likes</b>
@@ -61,7 +64,7 @@ function render(response) {
                               <span>${downloads}</span>
                             </p>
                         </div>
-                    </a>`
+                    </div>`
     }, '')
 };
 
