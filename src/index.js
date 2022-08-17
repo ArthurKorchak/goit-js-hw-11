@@ -4,6 +4,9 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 const axios = require('axios');
 
+axios.get('https://pixabay.com/api?key=29321884-a1107c4d69cb5633d7e5f5c25&q=cat')
+
+
 const form = document.querySelector('.search-form');
 const targepForAddingContent = document.querySelector('.gallery');
 const guard = document.querySelector('.guard')
