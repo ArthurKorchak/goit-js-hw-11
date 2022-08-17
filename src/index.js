@@ -14,13 +14,20 @@ form.addEventListener('submit', event => {
     if (request) {
         getter(1, request)
             .then(response => {
-                render(response)
-                new SimpleLightbox('.gallery a');
-            });
+                if (response.hits.length){
+                    render(response.hits);
+                    new SimpleLightbox('.gallery a');
+                    Notify.success(`Hooray! We found ${response.totalHits} images.`);
+                } else {
+                    Notify.failure('Sorry, your request not result.');
+                };
+            })
+            .catch(error => console.log(error));
+    } else {
+        Notify.failure('Please, input something!');
     };
     form.reset();
-})
-
+});
 
 function getter(numberOfPage, request) {
     return axios.get('https://pixabay.com/api', {
@@ -34,7 +41,7 @@ function getter(numberOfPage, request) {
             page: numberOfPage
         }
     })
-    .then(response => response.data.hits)
+    .then(response => response.data)
     .catch(error => console.log(error));
 };
 
@@ -65,6 +72,5 @@ function render(response) {
                             </p>
                         </div>
                     </div>`
-    }, '')
+    }, '');
 };
-
