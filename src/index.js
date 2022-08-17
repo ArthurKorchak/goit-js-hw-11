@@ -6,31 +6,60 @@ const axios = require('axios');
 
 const form = document.querySelector('.search-form');
 const targepForAddingContent = document.querySelector('.gallery');
+const guard = document.querySelector('.guard')
+const options = {
+    root: null,
+    rootMargin: '400px',
+    treshold: 1
+};
+let page = 1;
+let request;
+let lightbox;
+let isObserve = false;
+const observer = new IntersectionObserver(updateList, options)
+
+function updateList(data) {
+    data.forEach(data => {
+        if (data.isIntersecting) {
+            page += 1;
+            getter(page, request)
+                .then(response => {
+                    render(response.hits);
+                    lightbox.refresh();
+                });
+        };
+    });
+};
 
 form.addEventListener('submit', event => {
     event.preventDefault();
     targepForAddingContent.innerHTML = '';
-    const request = event.target[0].value;
+    request = event.target[0].value;
+    if (isObserve) {
+        observer.unobserve(guard);
+    };
+    page = 1;
     if (request) {
-        getter(1, request)
+        getter(page, request)
             .then(response => {
-                if (response.hits.length){
+                if (response.hits.length) {
                     render(response.hits);
-                    new SimpleLightbox('.gallery a');
+                    lightbox = new SimpleLightbox('.gallery a');
                     Notify.success(`Hooray! We found ${response.totalHits} images.`);
+                    observer.observe(guard);
+                    isObserve = true;
                 } else {
                     Notify.failure('Sorry, your request not result.');
                 };
-            })
-            .catch(error => console.log(error));
+            });
     } else {
         Notify.failure('Please, input something!');
     };
     form.reset();
 });
 
-function getter(numberOfPage, request) {
-    return axios.get('https://pixabay.com/api', {
+async function getter(numberOfPage, request) {
+    const answer = await axios.get('https://pixabay.com/api', {
         params: {
             key: '29321884-a1107c4d69cb5633d7e5f5c25',
             q: `${request}`,
@@ -40,18 +69,15 @@ function getter(numberOfPage, request) {
             per_page: 16,
             page: numberOfPage
         }
-    })
-    .then(response => response.data)
-    .catch(error => console.log(error));
+    });
+    return answer.data;
 };
 
 function render(response) {
-    console.log(response);
-    targepForAddingContent.innerHTML = 
-    response.reduce((acc, {largeImageURL, webformatURL, likes, views, comments, downloads}) => {
+    const content = response.reduce((acc, {largeImageURL, webformatURL, likes, views, comments, downloads}) => {
         return acc + `<div class="photo-card">
                         <a href="${largeImageURL}">
-                            <img class="img" src="${webformatURL}" alt="" loading="lazy" />
+                            <img class="img" src="${webformatURL}" height="400" loading="lazy"/>
                         </a>
                         <div class="info">
                             <p class="info-item">
@@ -73,4 +99,5 @@ function render(response) {
                         </div>
                     </div>`
     }, '');
+    targepForAddingContent.insertAdjacentHTML('beforeend', content);
 };
