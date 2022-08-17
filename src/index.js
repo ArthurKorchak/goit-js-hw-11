@@ -24,7 +24,7 @@ function updateList(data) {
             page += 1;
             getter(page, request)
                 .then(response => {
-                    render(response.hits);
+                    render(response.data.hits);
                     lightbox.refresh();
                 });
         };
@@ -42,10 +42,10 @@ form.addEventListener('submit', event => {
     if (request) {
         getter(page, request)
             .then(response => {
-                if (response.hits.length) {
-                    render(response.hits);
+                if (response.data.hits.length) {
+                    render(response.data.hits);
                     lightbox = new SimpleLightbox('.gallery a');
-                    Notify.success(`Hooray! We found ${response.totalHits} images.`);
+                    Notify.success(`Hooray! We found ${response.data.totalHits} images.`);
                     observer.observe(guard);
                     isObserve = true;
                 } else {
@@ -70,7 +70,7 @@ async function getter(numberOfPage, request) {
             page: numberOfPage
         }
     });
-    return answer.data;
+    return answer;
 };
 
 function render(response) {
