@@ -2,10 +2,7 @@ import './styles.css';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-const axios = require('axios');
-
-axios.get('https://pixabay.com/api?key=28851303-896d813d757a6464ec79bc796&q=cat')
-
+import axios from "axios";
 
 const form = document.querySelector('.search-form');
 const targepForAddingContent = document.querySelector('.gallery');
@@ -62,7 +59,7 @@ form.addEventListener('submit', event => {
 });
 
 async function getter(numberOfPage, request) {
-    const answer = await axios.get('https://pixabay.com/api', {
+    const answer = await axios.get('https://pixabay.com/api/' ,{
         params: {
             key: '29321884-a1107c4d69cb5633d7e5f5c25',
             q: `${request}`,
