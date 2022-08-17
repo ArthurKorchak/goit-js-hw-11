@@ -20,7 +20,7 @@ const observer = new IntersectionObserver(updateList, options)
 
 function updateList(data, observer) {
     data.forEach(data => {
-        if (data.isIntersecting && page < totalPages) {
+        if (data.isIntersecting && page <= totalPages) {
             getter(page, request)
                 .then(response => {
                     render(response.hits);
@@ -29,7 +29,7 @@ function updateList(data, observer) {
                     observer.observe(guard);
                     page += 1;
                 });
-        } else if (page === totalPages) {
+        } else if (page > totalPages) {
             Notify.info('We`re sorry, but you`ve reached the end of search results.');
             observer.unobserve(guard);
         };
