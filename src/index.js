@@ -8,25 +8,30 @@ const form = document.querySelector('.search-form');
 const targepForAddingContent = document.querySelector('.gallery');
 const guard = document.querySelector('.guard')
 const options = {
-    root: null,
-    rootMargin: '400px',
+    rootMargin: '200px',
     treshold: 1
 };
-let page = 1;
+let page;
+let totalPages;
 let request;
 let lightbox;
 let isObserve = false;
 const observer = new IntersectionObserver(updateList, options)
 
-function updateList(data) {
+function updateList(data, observer) {
     data.forEach(data => {
-        if (data.isIntersecting) {
-            page += 1;
+        if (data.isIntersecting && page < totalPages) {
             getter(page, request)
                 .then(response => {
                     render(response.hits);
                     lightbox.refresh();
+                    observer.unobserve(guard);
+                    observer.observe(guard);
+                    page += 1;
                 });
+        } else if (page === totalPages) {
+            Notify.info('We`re sorry, but you`ve reached the end of search results.');
+            observer.unobserve(guard);
         };
     });
 };
@@ -43,8 +48,8 @@ form.addEventListener('submit', event => {
         getter(page, request)
             .then(response => {
                 if (response.hits.length) {
-                    render(response.hits);
                     lightbox = new SimpleLightbox('.gallery a');
+                    totalPages = Math.ceil(response.totalHits / 40);
                     Notify.success(`Hooray! We found ${response.totalHits} images.`);
                     observer.observe(guard);
                     isObserve = true;
@@ -59,14 +64,14 @@ form.addEventListener('submit', event => {
 });
 
 async function getter(numberOfPage, request) {
-    const answer = await axios.get('https://pixabay.com/api/' ,{
+    const answer = await axios.get('https://pixabay.com/api/',{
         params: {
             key: '29321884-a1107c4d69cb5633d7e5f5c25',
             q: `${request}`,
             image_type: 'photo',
             orientation: 'horizontal',
             safesearch: true,
-            per_page: 16,
+            per_page: 40,
             page: numberOfPage
         }
     });
